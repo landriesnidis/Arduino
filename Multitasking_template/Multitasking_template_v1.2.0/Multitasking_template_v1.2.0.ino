@@ -16,7 +16,6 @@
   6.当时间片间隔过长时,多条AT指令缓存入栈中等待执行,栈长度可通过宏定义设置;
   7.支持软串口通信;
   
-  
   #备注
   1.使用多线程函数会占用较多的内存;
   2."多线程函数"和"通用定时函数"的示例函数各有两个;
@@ -25,7 +24,7 @@
   #作者信息
   ID:Landriesnidis
   E-mail:Landriesnidis@yeah.net
-  Github;https://github.com/landriesnidis
+  Github:https://github.com/landriesnidis
 */
 #include <EEPROM.h>
 #include <SoftwareSerial.h>
