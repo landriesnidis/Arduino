@@ -1,12 +1,8 @@
 /*
-   #更新说明 v1.2.0
-   1.新增多线程函数模板;
-   2.合并"AT解析"函数与"AT指令集"函数;
-   3.添加开源多线程库:Protothread(pt.h);
-   4.参数表结构体(ParameterBean)重命名为:StructParam;
-   5.缓存AT指令的堆栈长度参数(_CommandArraySize)重命名为:_ATStackSize;
-   6.循环周期时长变量(_Timestamp)重命名为:_LoopCycle;
-   
+   #更新说明 v1.2.2
+   1.新增软串口数据接收功能;
+   2.数据转发在硬件串口中显示;
+
   #功能介绍
   1.支持AT指令(可自定义指令);
   2.可通过AT指令查改配置信息;
@@ -14,13 +10,13 @@
   4.功能函数支持定时执行/定时多线程执行;
   5.可自定义设置时间片的间隔时长;
   6.当时间片间隔过长时,多条AT指令缓存入栈中等待执行,栈长度可通过宏定义设置;
-  7.支持软串口通信;
-  
+  7.支持软串口通信,AT指令向软串口转发数据;
+
   #备注
   1.使用多线程函数会占用较多的内存;
   2."多线程函数"和"通用定时函数"的示例函数各有两个;
   3.结构体StructParam成员变量发生改变后需通过AT指令"AT+INIT"初始化后才能正常使用;
-  
+
   #作者信息
   ID:Landriesnidis
   E-mail:Landriesnidis@yeah.net
@@ -60,8 +56,8 @@ struct StructParam {
   unsigned int _SerialBufferSize =    1024;                         //串口缓存字符长度
   unsigned long _BaudRate =           9600;                         //波特率
   unsigned long _SSBaudRate =         9600;                         //波特率
-  const char _Version[30] =           "Multitasking_template 1.2.0";//版本信息
-  const char _Date[11] =              "2016-04-09";                 //烧录时间
+  const char _Version[30] =           "Multitasking_template 1.2.2";//版本信息
+  const char _Date[11] =              "2016-04-11";                 //烧录时间
   /* - - - - - - - - 自定义成员变量 - - - - - - - - - -*/
 
 
@@ -117,16 +113,17 @@ void setup() {
 void loop() {
 
   ReceiveSerialData();
+  ReceiveSoftwareSerialData();
 
   if (CommandQueue_num > 0)
     AT_Commands();
 
   //自定义函数执行列表
   if (!_BoolAT) {
-    MultiThread_Function1(1000, &_Thread1);
-    MultiThread_Function2(5000, &_Thread2);
-    Timing_Function1(100);
-    Timing_Function2(1000);
+    //    MultiThread_Function1(1000, &_Thread1);
+    //    MultiThread_Function2(5000, &_Thread2);
+    //    Timing_Function1(100);
+    //    Timing_Function2(1000);
   }
   //时间片
   delay(ParameterList._LoopCycle);
@@ -213,12 +210,12 @@ static int MultiThread_Function2(const unsigned long Interval, struct pt *pt) {
 */
 void Timing_Function1(const unsigned long Interval) {
   /*— — — — — — — — — ↓ 时间控制 请勿改动 ↓ — — — — — — — — — — */
-  static unsigned int freq = 0;                      
+  static unsigned int freq = 0;
   if (++freq * ParameterList._LoopCycle < Interval) {
-    return;                                          
-  } else {                                           
-    freq = 0;                                        
-  }                                                  
+    return;
+  } else {
+    freq = 0;
+  }
   /*— — — — — — — — — ↑ 时间控制 请勿改动 ↑ — — — — — — — — — — */
 
   /*代码区域:开始*/
@@ -232,12 +229,12 @@ void Timing_Function1(const unsigned long Interval) {
 */
 void Timing_Function2(const unsigned long Interval) {
   /*— — — — — — — — — ↓ 时间控制 请勿改动 ↓ — — — — — — — — — — */
-  static unsigned int freq = 0;                      
+  static unsigned int freq = 0;
   if (++freq * ParameterList._LoopCycle < Interval) {
-    return;                                          
-  } else {                                           
-    freq = 0;                                        
-  }                                                  
+    return;
+  } else {
+    freq = 0;
+  }
   /*— — — — — — — — — ↑ 时间控制 请勿改动 ↑ — — — — — — — — — — */
 
   //代码区域:开始
@@ -287,6 +284,13 @@ void AT_Commands() {
   }
   if (item.equals("AT+CLEAN")) {                        //清空缓存
     CommandQueue_num = 0;
+    Serial.print("OK");
+    Serial.print(_Terminator);
+    return;
+  }
+  if (item.equals("AT+TSP")) {                          //转发至虚拟串口
+    SSerial.print(value);
+    SSerial.print("\r\n");
     Serial.print("OK");
     Serial.print(_Terminator);
     return;
@@ -447,6 +451,30 @@ void ReceiveSerialData() {
   }
   if (temp_s.length() > ParameterList._SerialBufferSize) {
     temp_s = "";
+  }
+}
+
+/**
+   接收软串口通信数据
+*/
+void ReceiveSoftwareSerialData() {
+  String temp_s = "";
+  char temp_c;
+
+  if (SSerial.available() > 0) {
+    Serial.print("[SSerial-BEGIN]\n\t|");
+    while (SSerial.available() > 0)
+    {
+      temp_c = SSerial.read();
+      temp_s += temp_c;
+      delay(2);
+    }
+    temp_s.replace("\n\n", "\n");
+    temp_s.replace("\n", "\n\t|");
+    Serial.print(temp_s);
+    Serial.print(_Terminator);
+    Serial.print("[SSerial-END]");
+    Serial.print(_Terminator);
   }
 }
 
