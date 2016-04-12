@@ -1,10 +1,15 @@
 /*
+  #更新说明 v1.0.1
+  1.完善注释,修正符号.
+  
   #功能介绍
   1.将模块连接至软串口,数据通过Arduino在软件串口和硬件串口之间转发.
+
   #备注
   1.起初使用Arduino模拟TTL的目的是为了ESP8266在计算机USB接口由于供电不足不能正常工作的问题.
-  2.与ESP8266连接后建议将软硬串口的比特率都设置为9600.
+  2.与ESP8266连接后建议将软硬串口的比特率都设置为9600(ESP8266修改波特率指令:AT+UART=9600,8,1,0,0).
   3.该代码分离自Multitasking_template_v1.2.3(模拟多线程的开源程序模板);
+
   #作者信息
   ID:Landriesnidis
   E-mail:Landriesnidis@yeah.net
@@ -23,8 +28,9 @@ SoftwareSerial SSerial(2, 3); // RX, TX
 void setup() {
   //串口波特率初始化
   Serial.begin(_HBAUD);        //设置串口波特率
-  SSerial.begin(_SBAUD);      //设置软串口波特率
+  SSerial.begin(_SBAUD);        //设置软串口波特率
   delay(50);
+  Serial.println("START");
 }
 
 void loop() {
