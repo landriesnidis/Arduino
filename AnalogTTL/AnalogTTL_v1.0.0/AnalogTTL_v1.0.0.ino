@@ -5,6 +5,7 @@
   #备注
   1.起初使用Arduino模拟TTL的目的是为了ESP8266在计算机USB接口由于供电不足不能正常工作的问题.
   2.与ESP8266连接后建议将软硬串口的比特率都设置为9600.
+  3.该代码分离自Multitasking_template_v1.2.3(模拟多线程的开源程序模板);
 
   #作者信息
   ID:Landriesnidis
