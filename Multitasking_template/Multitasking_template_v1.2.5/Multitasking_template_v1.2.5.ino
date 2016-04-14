@@ -1,6 +1,8 @@
 /*
    #更新说明 v1.2.5
    1.拆分了AT指令集分为解析函数和指令集函数.解决了缓存栈内命令不能正常执行的问题
+   2.新增AT指令"AT+LC",查看/设置循环间隔时间;
+   3.修复了AT指令查询无法显示的问题.
 
   #功能介绍
   1.支持AT指令(可自定义指令);
@@ -58,7 +60,7 @@ struct StructParam {
   unsigned long _BaudRate =           9600;                         //波特率
   unsigned long _SSBaudRate =         9600;                         //波特率
   const char _Version[30] =           "Multitasking_template 1.2.5";//版本信息
-  const char _Date[11] =              "2016-04-13";                 //烧录时间
+  const char _Date[11] =              "2016-04-14";                 //烧录时间
   /* - - - - - - - - 自定义成员变量 - - - - - - - - - -*/
 
 
@@ -117,14 +119,14 @@ void loop() {
   ReceiveSoftwareSerialData(0, true);
 
   if (CommandQueue_num > 0)
-    AT_Commands(getSerialData());
+    AT_Analyze(getSerialData());
 
   //自定义函数执行列表
   if (!_BoolAT) {
-    //    MultiThread_Function1(1000, &_Thread1);
-    //    MultiThread_Function2(5000, &_Thread2);
-    //    Timing_Function1(500);
-    //    Timing_Function2(1000);
+    MultiThread_Function1(1000, &_Thread1);
+    MultiThread_Function2(5000, &_Thread2);
+    Timing_Function1(500);
+    Timing_Function2(1000);
   }
   //时间片
   delay(ParameterList._LoopCycle);
@@ -245,55 +247,6 @@ void Timing_Function2(const unsigned long Interval) {
 }
 
 /**
-   发送Socket数据
-*/
-void sendData_Socket(String text) {
-  String cmd = "AT+CIPSEND=" + text.length();
-  printline_s(cmd);
-  delay(100);
-  printline_s(text);
-}
-
-/**
-   连接wifi
-*/
-void connectToWifi(String ssid, String psw) {
-  String cmd = ("AT+CWJAP=\"" + ssid + "\",\"" + psw + "\"");
-  printline_s(cmd);
-}
-
-/**
-   连接服务器
-*/
-void connectToServer(String type, String ip, int port) {
-  String cmd = ("AT+CIPSTART=\"" + type + "\",\"" + ip + "\"," + port);
-  printline_s(cmd);
-}
-
-/**
-   关闭连接
-*/
-void closeConnection() {
-  printline_s("AT+CIPCLOSE");
-}
-
-/**
-   输出一行字符串到硬件串口
-*/
-void printline_h(String text) {
-  Serial.print(text);
-  Serial.print(_Terminator);
-}
-
-/**
-   输出一行字符串到软件串口
-*/
-void printline_s(String text) {
-  SSerial.print(text);
-  SSerial.print(_TerminatorSS);
-}
-
-/**
    AT指令解析
 */
 void AT_Analyze(String command) {
@@ -309,10 +262,11 @@ void AT_Analyze(String command) {
       if (index == -1) {
         item = command;
         value = "";
+      } else {
+        item = command.substring(0, index);
+        value = command.substring(index + 1);
       }
-      item = command.substring(0, index);
-      value = command.substring(index + 1);
-      AT_Commands();
+      AT_Commands(item, value);
       command = getSerialData();
     }
   }
@@ -322,6 +276,7 @@ void AT_Analyze(String command) {
    AT指令集
 */
 void AT_Commands(String item, String value) {
+  Serial.print(_Terminator);
   //执行AT指令
   if (item.equals("AT")) {                                //AT测试
     Serial.print("OK");
@@ -443,6 +398,17 @@ void AT_Commands(String item, String value) {
   if (item.equals("AT+CLEAN")) {                        //清空缓存
     CommandQueue_num = 0;
     Serial.print("OK");
+    Serial.print(_Terminator);
+    return;
+  }
+  if (item.equals("AT+LC")) {                          //设置循环间隔时间
+    if (!value.equals("")) {
+      ParameterList._LoopCycle = value.toInt();
+      saveParameterBean();
+      Serial.print("OK");
+    } else {
+      Serial.print(ParameterList._LoopCycle);
+    }
     Serial.print(_Terminator);
     return;
   }
