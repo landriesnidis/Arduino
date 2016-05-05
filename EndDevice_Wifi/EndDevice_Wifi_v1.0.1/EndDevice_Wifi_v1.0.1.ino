@@ -54,7 +54,7 @@ struct StructParam {
   unsigned long _SSBaudRate =         9600;                         //波特率
   boolean _SS_ECHO =                  false;                        //软串口数据回显
   const char _Version[30] =           "EndDevice_Esp8266 1.0.1";    //版本信息
-  const char _Date[11] =              "2016-05-04";                 //烧录时间
+  const char _Date[11] =              "2016-05-05";                 //烧录时间
   /* - - - - - - - - 自定义成员变量 - - - - - - - - - -*/
   char _WIFI_SSID[30] =           "NSI-ITA";                        //WIFI名称
   char _WIFI_PSWD[30] =           "liguijie";                       //WIFI密码
