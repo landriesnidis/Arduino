@@ -616,7 +616,7 @@ void AT_Commands(String item, String value, int PRINT_MODE) {
     return;
   }
   if (item.equals("AT+DEVICE")) {                      //查看设备类型
-    printline(_DEVICE, PRINT_MODE);
+    printline("DEVICE " + _DEVICE, PRINT_MODE);
     return;
   }
   if (item.equals("AT+DATE")) {                         //查看烧录时间
@@ -774,7 +774,7 @@ void AT_Commands(String item, String value, int PRINT_MODE) {
       ParameterList._DEVICE_ID=value;
       printline("OK", PRINT_MODE);
     } else {
-      printline(ParameterList._DEVICE_ID, PRINT_MODE);
+      printline("DEVICEID " + ParameterList._DEVICE_ID, PRINT_MODE);
     }
     return;
   }
