@@ -23,7 +23,7 @@
 #define _TerminatorSS   "\r\n"                            //软件串口终止符(连接的模块所使用的终止符)
 
 //软串口设置
-SoftwareSerial SSerial(2, 3); // RX, TX
+SoftwareSerial SSerial(2, 4); // RX, TX
 
 void setup() {
   //串口波特率初始化
