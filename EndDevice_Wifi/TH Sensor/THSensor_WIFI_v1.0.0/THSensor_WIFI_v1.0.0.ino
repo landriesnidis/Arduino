@@ -65,9 +65,9 @@ SoftwareSerial SSerial(2, 4); // RX, TX
 dht11 DHT11;
 
 //设备信息常量
-const String _VERSION = "v1.0.1";                               //版本号
+const String _VERSION = "v1.0.0";                               //版本号
 const String _DEVICE  = "TH";                                   //设备类型
-const String _DATE    = "2016-05-25";                           //烧录日期
+const String _DATE    = "2016-05-31";                           //烧录日期
 
 //控制开关
 boolean _BoolAT        = false;
@@ -88,10 +88,10 @@ struct StructParam {
   unsigned long _SSBaudRate =         9600;                             //软串口波特率
   short         _SS_ECHO =            0;                                //软串口数据回显流向 0:null  1:hard  2:soft  3:socket
   /* - - - - - - - - WIFI模块成员变量 - - - - - - - - - -*/
-  char _WIFI_SSID[30] =               "NSI-ITA";                        //WIFI名称
-  char _WIFI_PSWD[30] =               "liguijie";                       //WIFI密码
+  char _WIFI_SSID[30] =               "KoalaTrans";                     //WIFI名称
+  char _WIFI_PSWD[30] =               "app2team";                       //WIFI密码
   bool _SERVER_TYPE   =               0;                                //服务器连接类型 0:TCP 1:UDP
-  char _SERVER_IP[30] =               "10.70.21.51";                    //服务器地址
+  char _SERVER_IP[30] =               "172.19.58.16";                   //服务器地址
   int  _SERVER_PORT   =               12346;                            //服务器端口
   bool _SERVER_AUTOCT =               1;                                //服务器自动连接
   /* - - - - - - - - 自定义成员变量 - - - - - - - - - -*/
@@ -191,7 +191,7 @@ void HT_Warning(const unsigned long Interval) {
     data += "TEMP:";
     data += String(ParameterList._TEMP_ALARMVALUE);
     data += " ";
-    s = 1
+    s = 1;
   }
 
   if (s)sendData_Socket(data);
@@ -290,7 +290,7 @@ void findKeyWords(char c) {
       return;
     }
     //输出字符串并初始化配置
-    printline_h("Get Message: " + receiveline);                                    //在这里输出Socket接收到的字符串
+    //printline_h(receiveline);                                    //在这里输出Socket接收到的字符串
     int i = receiveline.indexOf(_Separator);
     if (i == -1) {
       AT_Commands(receiveline, "", OUTPUTMODE_SOCKET);
